@@ -1,0 +1,96 @@
+# HOW TO USE THIS FILE
+
+# Installing this package works best if you do a little preparation first.
+# Whether you create your initial repository on GitHub, or use the Git Source Control Provider Visual Studio extension,
+# a default .gitignore file will already be at the root of your git repository.
+# Usually, this means it is directly within your main solution folder, as a sibling to your MyProject.sln file,
+# your .git folder, and possibly your packages directory.
+
+# In the Visual Studio Solution Explorer, right click your Solution node and select `Add > Existing Item`.
+# Navigate to the root .gitignore file and add it.
+# It will appear in your "Solution Items" folder, but only the path, not the file name.
+# This is because the file does not contain a name before the extension. Yay windows.
+# Regardless, this provides an easy way to get at your .gitignore file, which you will need to do after installing this package.
+
+# Now install this package. You will notice that a git.ignore file is added to your project directory (not your solution directory).
+# This is another wonderful windows *feature* that prevents nuget packages from copying nameless / extension-only files.
+# It doesn't matter though. All you have to do is open this git.ignore file (which you already have done), select all, copy,
+# then open your other .gitignore from the Solution Items folder select all, and paste.
+# When you are done, REMOVE THIS PACKAGE. You don't need it any more. It's pointless and it's wasting bits.
+
+# Unless you want to push all of your packages to your remote repository, enable NuGet Package Restore on your solution.
+# This .gitignore will make sure that NuGet.exe gets added, and your packages stay off of the remote.
+
+# Finally, you can delete all of this text to and including the #BEGIN GIT IGNORES line below.
+# For more information, see the README at https://github.com/danludwig/VisualStudioGitIgnore
+===================================================================================================================================
+
+#BEGIN GIT IGNORES
+#Ignore thumbnails created by windows
+Thumbs.db
+
+#Ignore files built by Visual Studio
+*.obj
+*.exe
+*.pdb
+*.user
+*.aps
+*.pch
+*.vspscc
+*_i.c
+*_p.c
+*.ncb
+*.suo
+*.tlb
+*.tlh
+*.bak
+*.cache
+*.ilk
+*.log
+[Bb]in
+[Dd]ebug*/
+*.lib
+*.sbr
+obj/
+[Rr]elease*/
+_ReSharper*/
+[Tt]est[Rr]esult*
+
+#Ignore packages directory
+Packages/
+
+#Allow NuGet.exe
+!NuGet.exe
+
+#Ignore generated nupkg files
+*.nupkg
+
+#Allow released nupkg files
+!MyProjectName.1.0.nupkg
+
+#Ignore local testsettings
+Local.testsettings
+
+#Allow R# .DotSettings
+!*.csproj.DotSettings
+
+#Ignore Azure build csdef & Pubxml files
+ServiceDefinition.build.csdef
+*.azurePubxml
+
+#Ignore WebDeploy publish profile
+*.Publish.xml
+
+#Ignore email files delivered to specified pickup directory
+*.eml
+
+#Allow chromedriver.exe
+!chromedriver.exe
+
+#Ignore _vti folders in ExpressionWeb
+desktop.ini
+_vti_cnf/
+_vti_pvt/
+
+#Ignore private folder
+/Private/

@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TorrentHardLinkHelper", "TorrentHardLinkHelper\TorrentHardLinkHelper.csproj", "{F60A582A-C5E4-4D17-97AB-B30E24F22D08}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TorrentHardLinkHelper.Library", "TorrentHardLinkHelper.Library\TorrentHardLinkHelper.Library.csproj", "{C0E94189-B243-4492-A113-6EB2DE57BCC0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TorrentHardLinkHelper.Test", "TorrentHardLinkHelper.Test\TorrentHardLinkHelper.Test.csproj", "{103E5401-FBB4-4DFB-9B10-4B40640B6E2D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F60A582A-C5E4-4D17-97AB-B30E24F22D08}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F60A582A-C5E4-4D17-97AB-B30E24F22D08}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F60A582A-C5E4-4D17-97AB-B30E24F22D08}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F60A582A-C5E4-4D17-97AB-B30E24F22D08}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C0E94189-B243-4492-A113-6EB2DE57BCC0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C0E94189-B243-4492-A113-6EB2DE57BCC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C0E94189-B243-4492-A113-6EB2DE57BCC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C0E94189-B243-4492-A113-6EB2DE57BCC0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{103E5401-FBB4-4DFB-9B10-4B40640B6E2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{103E5401-FBB4-4DFB-9B10-4B40640B6E2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{103E5401-FBB4-4DFB-9B10-4B40640B6E2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{103E5401-FBB4-4DFB-9B10-4B40640B6E2D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

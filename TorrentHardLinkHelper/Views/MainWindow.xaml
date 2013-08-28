@@ -1,0 +1,93 @@
+﻿<Window x:Class="TorrentHardLinkHelper.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+        xmlns:mvvm="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Extras.WPF4"
+        xmlns:models="clr-namespace:TorrentHardLinkHelper.Models"
+        DataContext="{Binding Source={StaticResource Locator}, Path=Main}"
+        Title="Torrent HardLink Helper" Height="700" Width="680">
+    <Grid Margin="5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Label Grid.Row="0" Grid.Column="0" Content="Torrent File:" HorizontalContentAlignment="Right" VerticalAlignment="Center"></Label>
+            <Label Grid.Row="1" Grid.Column="0" Content="Source Folder:" HorizontalContentAlignment="Right" VerticalAlignment="Center"></Label>
+            <Label Grid.Row="2" Grid.Column="0" Content="Output BaseFolder:" HorizontalContentAlignment="Right" VerticalAlignment="Center"></Label>
+            <TextBox Grid.Row="0" Grid.Column="1" Margin="5" VerticalContentAlignment="Center" IsReadOnly="True" Text="{Binding TorrentFile}"></TextBox>
+            <TextBox Grid.Row="1" Grid.Column="1" Margin="5" VerticalContentAlignment="Center" IsReadOnly="True" Text="{Binding SourceFolder}"></TextBox>
+            <TextBox Grid.Row="2" Grid.Column="1" Margin="5" VerticalContentAlignment="Center" IsReadOnly="True" Text="{Binding OutputBaseFolder}"></TextBox>
+            <Button Grid.Row="0" Grid.Column="2" Content="Select" Margin="5" Padding="10,5" Command="{Binding SelectTorrentFileCommand}"></Button>
+            <Button Grid.Row="1" Grid.Column="2" Content="Select" Margin="5" Padding="10,5" Command="{Binding SelectSourceFolder}"></Button>
+            <Button Grid.Row="2" Grid.Column="2" Content="Select" Margin="5" Padding="10,5" Command="{Binding SelectOutputBaseFolder}"></Button>
+        </Grid>
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Grid.Resources>
+                <HierarchicalDataTemplate x:Key="EntityTemplate" DataType="models:EntityModel" ItemsSource="{Binding Entities}">
+                    <TextBlock Text="{Binding Name}" Foreground="{Binding TextColor, Mode=OneWay}"></TextBlock>
+                </HierarchicalDataTemplate>
+            </Grid.Resources>
+            <Label Grid.Row="0" Grid.Column="0" Content="Source Files"></Label>
+            <Label Grid.Row="0" Grid.Column="1" Content="Torrent Files"></Label>
+            <TreeView x:Name="TvFileSystem" Grid.Row="1" Grid.Column="0" Margin="5" ItemsSource="{Binding FileSystemEntityModel}" ItemTemplate="{StaticResource EntityTemplate}"></TreeView>
+            <TreeView x:Name="TvTorrent" Grid.Row="1" Grid.Column="1" Margin="5" ItemsSource="{Binding TorrentEntityModel}" ItemTemplate="{StaticResource EntityTemplate}"></TreeView>
+            <StackPanel Grid.Row="2" Grid.Column="0" Margin="5" Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="Expande All" Margin="5" Command="{Binding ExpandAllCommand}" CommandParameter="{Binding ElementName=TvFileSystem}"></Button>
+                <Button Content="Collapse All" Margin="5" Command="{Binding CollapseAllCommand}" CommandParameter="{Binding ElementName=TvFileSystem}"></Button>
+            </StackPanel>
+            <StackPanel Grid.Row="2" Grid.Column="1" Margin="5" Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="Expande All" Margin="5" Command="{Binding ExpandAllCommand}" CommandParameter="{Binding ElementName=TvTorrent}"></Button>
+                <Button Content="Collapse All" Margin="5" Command="{Binding CollapseAllCommand}" CommandParameter="{Binding ElementName=TvTorrent}"></Button>
+            </StackPanel>
+        </Grid>
+        <Grid Grid.Row="2" Margin="5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Label Grid.Column="0" Content="Output Folder Name:"></Label>
+            <TextBox Grid.Column="1" Text="{Binding OutputName}" VerticalContentAlignment="Center" IsReadOnly="{Binding IsOutputNameReadonly, Mode=OneWay}"></TextBox>
+            <ComboBox Grid.Column="2" ItemsSource="{Binding OutputNameTypes}" SelectedIndex="0" Width="120" Margin="10,0,0,0" Text="{Binding OutputNameType}">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="SelectionChanged">
+                        <mvvm:EventToCommand Command="{Binding OutputNameTypeChangedCommand}" PassEventArgsToCommand="True"></mvvm:EventToCommand>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </ComboBox>
+        </Grid>
+
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="Analyse" Padding="10,5" Margin="5" Command="{Binding AnalyseCommand}"></Button>
+            <Button Content="Link" Padding="10,5" Margin="5" Command="{Binding LinkCommand}"></Button>
+        </StackPanel>
+        <StatusBar Grid.Row="4" Margin="0,10,0,0">
+            <StatusBarItem HorizontalAlignment="Stretch">
+                <TextBlock Text="{Binding Status}" Background="Transparent"></TextBlock>
+            </StatusBarItem>
+        </StatusBar>
+    </Grid>
+</Window>

@@ -1,0 +1,85 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{C0E94189-B243-4492-A113-6EB2DE57BCC0}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>TorrentHardLinkHelper</RootNamespace>
+    <AssemblyName>TorrentHardLinkHelper.Library</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BEncoding\BEncodedDictionary.cs" />
+    <Compile Include="BEncoding\BEncodedList.cs" />
+    <Compile Include="BEncoding\BEncodedNumber.cs" />
+    <Compile Include="BEncoding\BEncodedString.cs" />
+    <Compile Include="BEncoding\BEncodingException.cs" />
+    <Compile Include="BEncoding\IBEncodedValue.cs" />
+    <Compile Include="BEncoding\RawReader.cs" />
+    <Compile Include="Common\Check.cs" />
+    <Compile Include="Common\EncryptionTypes.cs" />
+    <Compile Include="Common\Toolbox.cs" />
+    <Compile Include="Common\UriHelper.cs" />
+    <Compile Include="HardLink\HardLinkHelper.cs" />
+    <Compile Include="Locate\FileSystemFileInfo.cs" />
+    <Compile Include="Locate\FileSystemFileSearcher.cs" />
+    <Compile Include="Locate\LinkState.cs" />
+    <Compile Include="Locate\LocateResult.cs" />
+    <Compile Include="Locate\LocateState.cs" />
+    <Compile Include="Locate\TorrentFileLink.cs" />
+    <Compile Include="Locate\TorrentFileLocater.cs" />
+    <Compile Include="Messages\IMessage.cs" />
+    <Compile Include="Messages\Message.cs" />
+    <Compile Include="Messages\MessageException.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Torrents\BitField.cs" />
+    <Compile Include="Torrents\Enums.cs" />
+    <Compile Include="Torrents\HashAlgoFactory.cs" />
+    <Compile Include="Torrents\Hashes.cs" />
+    <Compile Include="Torrents\InfoHash.cs" />
+    <Compile Include="Torrents\RawTrackerTier.cs" />
+    <Compile Include="Torrents\RawTrackerTiers.cs" />
+    <Compile Include="Torrents\Torrent.cs" />
+    <Compile Include="Torrents\TorrentException.cs" />
+    <Compile Include="Torrents\TorrentFile.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
