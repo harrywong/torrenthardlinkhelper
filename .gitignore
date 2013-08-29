@@ -62,6 +62,9 @@ Packages/
 #Allow NuGet.exe
 !NuGet.exe
 
+#Allow Net-z
+!netz.exe
+
 #Ignore generated nupkg files
 *.nupkg
 
