@@ -11,14 +11,16 @@ namespace TorrentHardLinkHelper.HardLink
         private readonly string _outputBaseFolder;
         private readonly string _folderName;
         private readonly IList<TorrentFileLink> _links;
+        private readonly long _copyLimitSize;
 
-        public HardLinkHelper(IList<TorrentFileLink> links)
+        public HardLinkHelper(IList<TorrentFileLink> links, int copyLimitSize)
         {
             this._links = links;
+            this._copyLimitSize = copyLimitSize*1024L;
         }
 
-        public HardLinkHelper(IList<TorrentFileLink> links, string folderName, string baseFolder)
-            : this(links)
+        public HardLinkHelper(IList<TorrentFileLink> links, int copyLimitSize, string folderName, string baseFolder)
+            : this(links, copyLimitSize)
         {
             this._folderName = folderName;
             this._outputBaseFolder = baseFolder;
@@ -50,7 +52,15 @@ namespace TorrentHardLinkHelper.HardLink
                     }
                 }
                 string targetFile = Path.Combine(rootFolder, link.TorrentFile.Path);
-                CreateHarkLink(link.LinkedFsFileInfo.FilePath, targetFile);
+
+                if (link.TorrentFile.Length > this._copyLimitSize)
+                {
+                    CreateHarkLink(link.LinkedFsFileInfo.FilePath, targetFile);
+                }
+                else
+                {
+                    Copy(link.LinkedFsFileInfo.FilePath, targetFile);
+                }
             }
         }
 
@@ -59,6 +69,24 @@ namespace TorrentHardLinkHelper.HardLink
             var procStartInfo =
                 new ProcessStartInfo("cmd",
                     "/c " + string.Format("fsutil hardlink create \"{0}\" \"{1}\"", target, source));
+
+            // The following commands are needed to redirect the standard output.
+            // This means that it will be redirected to the Process.StandardOutput StreamReader.
+            procStartInfo.RedirectStandardOutput = true;
+            procStartInfo.UseShellExecute = false;
+            // Do not create the black window.
+            procStartInfo.CreateNoWindow = true;
+            // Now we create a process, assign its ProcessStartInfo and start it
+            Process proc = new Process();
+            proc.StartInfo = procStartInfo;
+            proc.Start();
+        }
+
+        private void Copy(string source, string target)
+        {
+            var procStartInfo =
+                new ProcessStartInfo("cmd",
+                    "/c " + string.Format("copy /y \"{0}\" \"{1}\"", source, target));
 
             // The following commands are needed to redirect the standard output.
             // This means that it will be redirected to the Process.StandardOutput StreamReader.

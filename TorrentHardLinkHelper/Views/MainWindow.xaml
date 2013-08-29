@@ -5,7 +5,7 @@
         xmlns:mvvm="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Extras.WPF4"
         xmlns:models="clr-namespace:TorrentHardLinkHelper.Models"
         DataContext="{Binding Source={StaticResource Locator}, Path=Main}"
-        Title="Torrent HardLink Helper" Height="700" Width="680">
+        Title="Torrent HardLink Helper v0.2" Height="700" Width="680">
     <Grid Margin="5">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
@@ -64,25 +64,41 @@
             </StackPanel>
         </Grid>
         <Grid Grid.Row="2" Margin="5">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"></ColumnDefinition>
-                <ColumnDefinition Width="*"></ColumnDefinition>
-                <ColumnDefinition Width="Auto"></ColumnDefinition>
-            </Grid.ColumnDefinitions>
-            <Label Grid.Column="0" Content="Output Folder Name:"></Label>
-            <TextBox Grid.Column="1" Text="{Binding OutputName}" VerticalContentAlignment="Center" IsReadOnly="{Binding IsOutputNameReadonly, Mode=OneWay}"></TextBox>
-            <ComboBox Grid.Column="2" ItemsSource="{Binding OutputNameTypes}" SelectedIndex="0" Width="120" Margin="10,0,0,0" Text="{Binding OutputNameType}">
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="SelectionChanged">
-                        <mvvm:EventToCommand Command="{Binding OutputNameTypeChangedCommand}" PassEventArgsToCommand="True"></mvvm:EventToCommand>
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
-            </ComboBox>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Label Grid.Column="0" Content="Output Folder Name:"></Label>
+                <TextBox Grid.Column="1" Text="{Binding OutputName}" VerticalContentAlignment="Center" IsReadOnly="{Binding IsOutputNameReadonly, Mode=OneWay}"></TextBox>
+                <ComboBox Grid.Column="2" ItemsSource="{Binding OutputNameTypes}" SelectedIndex="0" Width="120" Margin="10,0,0,0" Text="{Binding OutputNameType}">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="SelectionChanged">
+                            <mvvm:EventToCommand Command="{Binding OutputNameTypeChangedCommand}" PassEventArgsToCommand="True"></mvvm:EventToCommand>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </ComboBox>
+            </Grid>
+            <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,10,0,0">
+                <TextBlock VerticalAlignment="Center">
+                    <Run Text="Just"></Run>
+                    <Run Text="COPY" FontWeight="Bold"></Run>
+                    <Run Text="not Hard-Link when filesize is below: "></Run>
+                </TextBlock>
+                <TextBox VerticalContentAlignment="Center" Margin="5,0,0,0" Width="50" Text="1024" HorizontalContentAlignment="Right"></TextBox>
+                <Label Content="KB"></Label>
+            </StackPanel>
         </Grid>
+
 
         <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right">
             <Button Content="Analyse" Padding="10,5" Margin="5" Command="{Binding AnalyseCommand}"></Button>
-            <Button Content="Link" Padding="10,5" Margin="5" Command="{Binding LinkCommand}"></Button>
+            <Button Content="Hard-Link" Padding="10,5" Margin="5" Command="{Binding LinkCommand}"></Button>
         </StackPanel>
         <StatusBar Grid.Row="4" Margin="0,10,0,0">
             <StatusBarItem HorizontalAlignment="Stretch">

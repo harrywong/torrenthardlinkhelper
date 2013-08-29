@@ -1,6 +1,5 @@
-using Autofac;
-using Autofac.Extras.CommonServiceLocator;
 using Microsoft.Practices.ServiceLocation;
+using GalaSoft.MvvmLight.Ioc;
 
 namespace TorrentHardLinkHelper.ViewModels
 {
@@ -15,13 +14,16 @@ namespace TorrentHardLinkHelper.ViewModels
         /// </summary>
         public ViewModelLocator()
         {
-            var builder = new ContainerBuilder();
-            builder.RegisterType<MainViewModel>();
+            var container = new SimpleIoc();
+            container.Register<MainViewModel>();
 
-            IContainer container = builder.Build();
-            var locator = new AutofacServiceLocator(container);
+            //var builder = new ContainerBuilder();
+            //builder.RegisterType<MainViewModel>();
 
-            ServiceLocator.SetLocatorProvider(() => locator);
+            //IContainer container = builder.Build();
+            //var locator = new AutofacServiceLocator(container);
+
+            ServiceLocator.SetLocatorProvider(() => container);
         }
 
         public MainViewModel Main

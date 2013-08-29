@@ -39,6 +39,10 @@ namespace TorrentHardLinkHelper.Locate
 
             public string Run()
             {
+                if (_fileLinkPieces.Any(c => c.FileLink.FsFileInfos.Count == 0))
+                {
+                    return null;
+                }
                 this.Run(0, "");
                 return this._validPattern;
             }
@@ -51,11 +55,6 @@ namespace TorrentHardLinkHelper.Locate
                 }
                 if (index < this._fileLinkPieces.Count)
                 {
-                    if (this._fileLinkPieces[index].FileLink.FsFileInfos.Count == 0)
-                    {
-                        this._result = 0;
-                        return;
-                    }
                     for (int i = 0; i < this._fileLinkPieces[index].FileLink.FsFileInfos.Count; i++)
                     {
                         string nextPattern = pattern + i + ',';
@@ -183,8 +182,18 @@ namespace TorrentHardLinkHelper.Locate
         {
             foreach (TorrentFileLink fileLink in this._torrentFileLinks)
             {
-                if (fileLink.State != LinkState.NeedConfirm)
+                if (fileLink.State == LinkState.Located)
                 {
+                    continue;
+                }
+                if (fileLink.State == LinkState.Fail)
+                {
+                    if (fileLink.TorrentFile.EndPieceIndex - fileLink.TorrentFile.StartPieceIndex > 2)
+                    {
+                        fileLink.State = CheckPiece(fileLink.TorrentFile.StartPieceIndex + 1)
+                            ? LinkState.Located
+                            : LinkState.Fail;
+                    }
                     continue;
                 }
                 for (int i = fileLink.TorrentFile.StartPieceIndex; i <= fileLink.TorrentFile.EndPieceIndex; i++)
@@ -247,7 +256,10 @@ namespace TorrentHardLinkHelper.Locate
             {
                 foreach (FileLinkPiece piece in filePieces)
                 {
-                    piece.FileLink.State = LinkState.Fail;
+                    if (piece.FileLink.State == LinkState.NeedConfirm)
+                    {
+                        piece.FileLink.State = LinkState.Fail;
+                    }
                 }
                 this._pieceCheckedReusltsDictionary.Add(pieceIndex, false);
                 return false;

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -26,10 +27,12 @@ namespace TorrentHardLinkHelper.ViewModels
         private string _status;
         private string _outputNameType;
         private bool _isOutputNameReadonly;
+        private int _copyLimitSize;
         private Torrent _torrent;
         private IList<FileSystemFileInfo> _fileSystemFileInfos;
         private IList<EntityModel> _fileSystemEntityModel;
         private IList<EntityModel> _torrentEntityModel;
+
 
         private LocateResult _locateResult;
 
@@ -50,6 +53,7 @@ namespace TorrentHardLinkHelper.ViewModels
             this.InitCommands();
             this.InitStyles();
             this.Set(() => this.IsOutputNameReadonly, ref this._isOutputNameReadonly, true);
+            this.Set(() => this.CopyLimitSize, ref this._copyLimitSize, 1024);
             this.UpdateStatusFormat("Ready.");
         }
 
@@ -170,11 +174,18 @@ namespace TorrentHardLinkHelper.ViewModels
             }
         }
 
-        private async void Analyse()
+        private void Analyse()
         {
             this.UpdateStatusFormat("Locating...");
-            LocateResult result = await Locate();
+            var func = new Func<LocateResult>(Locate);
+            func.BeginInvoke(AnalyseFinish, func);
+        }
 
+        private void AnalyseFinish(IAsyncResult ar)
+        {
+            var func = ar.AsyncState as Func<LocateResult>;
+            LocateResult result = func.EndInvoke(ar);
+            
             this.UpdateStatusFormat("Successfully located {0} of {1} file(s). Mathched {2} of {3} file(s) on disk.",
                 result.LocatedCount,
                 result.LocatedCount + result.UnlocatedCount,
@@ -190,20 +201,15 @@ namespace TorrentHardLinkHelper.ViewModels
 
             this.Set(() => this.TorrentEntityModel, ref this._torrentEntityModel,
                 new[] { EntityModel.Load(this._torrent.Name, result) });
+
         }
 
-        private Task<LocateResult> Locate()
+        private LocateResult Locate()
         {
-            return Task<LocateResult>.Factory.StartNew(() =>
-            {
-                //if (this._fileSystemFileInfos == null)
-                //{
-                this._fileSystemFileInfos = FileSystemFileSearcher.SearchFolder(this._sourceFolder);
-                //}
-                var locater = new TorrentFileLocater(this._torrent, this._fileSystemFileInfos);
-                LocateResult result = locater.Locate();
-                return result;
-            });
+            this._fileSystemFileInfos = FileSystemFileSearcher.SearchFolder(this._sourceFolder);
+            var locater = new TorrentFileLocater(this._torrent, this._fileSystemFileInfos);
+            LocateResult result = locater.Locate();
+            return result;
         }
 
         private void Link()
@@ -215,9 +221,10 @@ namespace TorrentHardLinkHelper.ViewModels
             }
 
             this.UpdateStatusFormat("Linking...");
-            var helper = new HardLinkHelper(this._locateResult.TorrentFileLinks, this._outputName, this._outputBaseFolder);
+            var helper = new HardLinkHelper(this._locateResult.TorrentFileLinks, this._copyLimitSize, this._outputName, this._outputBaseFolder);
             helper.HardLink();
             this.UpdateStatusFormat("Done.");
+            Process.Start("explorer.exe", Path.Combine(this._outputBaseFolder, this._outputName));
         }
 
         #region Properties
@@ -275,6 +282,12 @@ namespace TorrentHardLinkHelper.ViewModels
         public IList<EntityModel> TorrentEntityModel
         {
             get { return this._torrentEntityModel; }
+        }
+
+        public int CopyLimitSize
+        {
+            get { return this._copyLimitSize; }
+            set { this._copyLimitSize = value; }
         }
 
         #endregion
