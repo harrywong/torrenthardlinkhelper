@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using GalaSoft.MvvmLight;
@@ -18,7 +17,7 @@ namespace TorrentHardLinkHelper.ViewModels
 {
     public class MainViewModel : ViewModelBase
     {
-        private static readonly IList<string> _outputNameTypes = new[] { "Torrent Name", "Torrent Title", "Custom" };
+        private static readonly IList<string> _outputNameTypes = new[] {"Torrent Name", "Torrent Title", "Custom"};
 
         private string _torrentFile;
         private string _sourceFolder;
@@ -28,11 +27,12 @@ namespace TorrentHardLinkHelper.ViewModels
         private string _outputNameType;
         private bool _isOutputNameReadonly;
         private int _copyLimitSize;
+        private int _maxProcess;
+        private int _curProcess;
         private Torrent _torrent;
         private IList<FileSystemFileInfo> _fileSystemFileInfos;
         private IList<EntityModel> _fileSystemEntityModel;
         private IList<EntityModel> _torrentEntityModel;
-
 
         private LocateResult _locateResult;
 
@@ -83,7 +83,7 @@ namespace TorrentHardLinkHelper.ViewModels
                 {
                     this.Set(() => this.SourceFolder, ref this._sourceFolder, dialog.SelectedPath);
                     this.Set(() => this.FileSystemEntityModel, ref this._fileSystemEntityModel,
-                        new[] { EntityModel.Load(this._sourceFolder) });
+                        new[] {EntityModel.Load(this._sourceFolder)});
                 }
             });
 
@@ -102,7 +102,9 @@ namespace TorrentHardLinkHelper.ViewModels
                 () => !string.IsNullOrEmpty(this._torrentFile) && !string.IsNullOrEmpty(this._sourceFolder));
 
             this._linkCommand = new RelayCommand(Link,
-                () => !string.IsNullOrEmpty(this._outputBaseFolder) && !string.IsNullOrEmpty(this._outputName) && this._locateResult != null);
+                () =>
+                    !string.IsNullOrEmpty(this._outputBaseFolder) && !string.IsNullOrEmpty(this._outputName) &&
+                    this._locateResult != null);
 
             this._outputNameTypeChangedCommand =
                 new RelayCommand<SelectionChangedEventArgs>(
@@ -114,8 +116,8 @@ namespace TorrentHardLinkHelper.ViewModels
 
         private void InitStyles()
         {
-            this._expandAllStyle = new Style(typeof(TreeViewItem));
-            this._collapseAllStyle = new Style(typeof(TreeViewItem));
+            this._expandAllStyle = new Style(typeof (TreeViewItem));
+            this._collapseAllStyle = new Style(typeof (TreeViewItem));
 
             this._expandAllStyle.Setters.Add(new Setter(TreeViewItem.IsExpandedProperty, true));
             this._collapseAllStyle.Setters.Add(new Setter(TreeViewItem.IsExpandedProperty, false));
@@ -137,7 +139,7 @@ namespace TorrentHardLinkHelper.ViewModels
                 this._torrent = Torrent.Load(this._torrentFile);
                 this.ChangeOutputFolderNmae(this._outputNameType);
                 this.Set(() => this.TorrentEntityModel, ref this._torrentEntityModel,
-                    new[] { EntityModel.Load(this._torrent) });
+                    new[] {EntityModel.Load(this._torrent)});
             }
             catch (Exception ex)
             {
@@ -176,7 +178,7 @@ namespace TorrentHardLinkHelper.ViewModels
 
         private void Analyse()
         {
-            this.UpdateStatusFormat("Locating...");
+            this.UpdateStatusFormat("Locating... This may take several minutes.");
             var func = new Func<LocateResult>(Locate);
             func.BeginInvoke(AnalyseFinish, func);
         }
@@ -185,7 +187,7 @@ namespace TorrentHardLinkHelper.ViewModels
         {
             var func = ar.AsyncState as Func<LocateResult>;
             LocateResult result = func.EndInvoke(ar);
-            
+
             this.UpdateStatusFormat("Successfully located {0} of {1} file(s). Mathched {2} of {3} file(s) on disk.",
                 result.LocatedCount,
                 result.LocatedCount + result.UnlocatedCount,
@@ -200,14 +202,16 @@ namespace TorrentHardLinkHelper.ViewModels
             this.RaisePropertyChanged(() => this.FileSystemEntityModel);
 
             this.Set(() => this.TorrentEntityModel, ref this._torrentEntityModel,
-                new[] { EntityModel.Load(this._torrent.Name, result) });
-
+                new[] {EntityModel.Load(this._torrent.Name, result)});
         }
 
         private LocateResult Locate()
         {
             this._fileSystemFileInfos = FileSystemFileSearcher.SearchFolder(this._sourceFolder);
-            var locater = new TorrentFileLocater(this._torrent, this._fileSystemFileInfos);
+            var locater = new TorrentFileLocater(this._torrent, this._fileSystemFileInfos,
+                () => this.Set(() => this.CurPorcess, ref this._curProcess, this._curProcess + 1));
+            this.Set(() => this.MaxProcess, ref this._maxProcess, this._torrent.Files.Length);
+            this.Set(() => this.CurPorcess, ref this._curProcess, 0);
             LocateResult result = locater.Locate();
             return result;
         }
@@ -216,12 +220,14 @@ namespace TorrentHardLinkHelper.ViewModels
         {
             if (Path.GetPathRoot(this._outputBaseFolder) != Path.GetPathRoot(this._sourceFolder))
             {
-                this.UpdateStatusFormat("Link failed, the output basefolder and the source folder must be in the same driver!");
+                this.UpdateStatusFormat(
+                    "Link failed, the output basefolder and the source folder must be in the same driver!");
                 return;
             }
 
             this.UpdateStatusFormat("Linking...");
-            var helper = new HardLinkHelper(this._locateResult.TorrentFileLinks, this._copyLimitSize, this._outputName, this._outputBaseFolder);
+            var helper = new HardLinkHelper(this._locateResult.TorrentFileLinks, this._copyLimitSize, this._outputName,
+                this._outputBaseFolder);
             helper.HardLink();
             this.UpdateStatusFormat("Done.");
             Process.Start("explorer.exe", Path.Combine(this._outputBaseFolder, this._outputName));
@@ -288,6 +294,16 @@ namespace TorrentHardLinkHelper.ViewModels
         {
             get { return this._copyLimitSize; }
             set { this._copyLimitSize = value; }
+        }
+
+        public int MaxProcess
+        {
+            get { return this._maxProcess; }
+        }
+
+        public int CurPorcess
+        {
+            get { return this._curProcess; }
         }
 
         #endregion

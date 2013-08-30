@@ -28,6 +28,8 @@ namespace TorrentHardLinkHelper.Locate
             private readonly Torrent _torrent;
             private readonly int _pieceIndex;
             private string _validPattern;
+            private List<string> _patterns;
+            private int _finishedCount;
 
             public HashFileLinkPieces(Torrent torrent, int pieceIndex, IList<FileLinkPiece> fileLinkPieces)
             {
@@ -47,7 +49,7 @@ namespace TorrentHardLinkHelper.Locate
                 return this._validPattern;
             }
 
-            private void Run(int index, string pattern)
+            private void FindPatterns(int index, string pattern)
             {
                 if (this._result != -1)
                 {
@@ -59,6 +61,45 @@ namespace TorrentHardLinkHelper.Locate
                     {
                         string nextPattern = pattern + i + ',';
                         int nextIndex = index + 1;
+                        FindPatterns(nextIndex, nextPattern);
+                    }
+                }
+                else
+                {
+                    this._patterns.Add(pattern);
+                }
+            }
+
+            private void CheckPattern(string pattern)
+            {
+
+            }
+
+            private void CheckPetternFinish(IAsyncResult ar)
+            {
+
+            }
+
+            private void Run(int index, string pattern)
+            {
+                if (this._result != -1)
+                {
+                    return;
+                }
+                if (index < this._fileLinkPieces.Count)
+                {
+                    for (int i = 0; i < this._fileLinkPieces[index].FileLink.FsFileInfos.Count; i++)
+                    {
+                        if (this._fileLinkPieces[index].FileLink.TorrentFile.StartPieceIndex == this._pieceIndex &&
+                            this._fileLinkPieces[index].FileLink.TorrentFile.EndPieceIndex == this._pieceIndex)
+                        {
+                            if (this._fileLinkPieces[index].FileLink.FsFileInfos[i].Located)
+                            {
+                                continue;
+                            }
+                        }
+                        string nextPattern = pattern + i + ',';
+                        int nextIndex = index + 1;
                         Run(nextIndex, nextPattern);
                     }
                 }
@@ -68,10 +109,6 @@ namespace TorrentHardLinkHelper.Locate
                     for (int i = 0; i < this._fileLinkPieces.Count; i++)
                     {
                         int fileIndex = int.Parse(pattern.Split(',')[i]);
-                        if (this._fileLinkPieces[i].FileLink.FsFileInfos[fileIndex].Located)
-                        {
-                            return;
-                        }
                         FileStream fileStream =
                             File.OpenRead(this._fileLinkPieces[i].FileLink.FsFileInfos[fileIndex].FilePath);
                         var buffer = new byte[this._fileLinkPieces[i].ReadLength];
@@ -97,6 +134,8 @@ namespace TorrentHardLinkHelper.Locate
         private readonly Dictionary<int, bool> _pieceCheckedReusltsDictionary;
         private readonly Torrent _torrent;
 
+        private readonly Action _fileLocating;
+
         public TorrentFileLocater()
         {
             this._torrentFileLinks = new List<TorrentFileLink>();
@@ -115,6 +154,13 @@ namespace TorrentHardLinkHelper.Locate
             this._fsfiFileInfos = fsfiFileInfos;
         }
 
+        public TorrentFileLocater(Torrent torrent, IList<FileSystemFileInfo> fsfiFileInfos, Action fileLocating)
+            : this(torrent, fsfiFileInfos)
+        {
+            this._fileLocating = fileLocating;
+        }
+
+
         public LocateResult Locate()
         {
             if (this._torrent == null)
@@ -131,6 +177,14 @@ namespace TorrentHardLinkHelper.Locate
             return new LocateResult(this._torrentFileLinks);
         }
 
+        public void PorcessTorrentFile()
+        {
+            foreach (TorrentFile torrentFile in this._torrent.Files)
+            {
+
+            }
+        }
+
         private void FindTorrentFileLinks()
         {
             foreach (TorrentFile torrentFile in this._torrent.Files)
@@ -145,17 +199,30 @@ namespace TorrentHardLinkHelper.Locate
                 }
                 if (fileLink.FsFileInfos.Count > 1)
                 {
-                    if (fileLink.FsFileInfos.Any(f => f.FileName == Path.GetFileName(torrentFile.Path)))
+                    var torrentFilePathParts = torrentFile.Path.Split('\\');
+                    for (int i = 0; i < torrentFilePathParts.Length; i++)
                     {
-                        fileLink.FsFileInfos =
-                            fileLink.FsFileInfos.Where(f => f.FileName == Path.GetFileName(torrentFile.Path)).ToList();
-                        if (fileLink.FsFileInfos.Count > 1)
+                        var links = new List<FileSystemFileInfo>();
+                        foreach (var fileInfo in fileLink.FsFileInfos)
                         {
-                            if (fileLink.FsFileInfos.Any(f => f.FilePath.Contains(torrentFile.Path)))
+                            var filePathPaths = fileInfo.FilePath.Split('\\');
+                            if (filePathPaths.Length > i + 1 &&
+                                filePathPaths[filePathPaths.Length - i - 1].ToUpperInvariant() ==
+                                torrentFilePathParts[torrentFilePathParts.Length - i - 1].ToUpperInvariant())
                             {
-                                fileLink.FsFileInfos =
-                                    fileLink.FsFileInfos.Where(f => f.FilePath.Contains(torrentFile.Path))
-                                        .ToList();
+                                links.Add(fileInfo);
+                            }
+                        }
+                        if (links.Count == 0)
+                        {
+                            break;
+                        }
+                        if (links.Count >= 1)
+                        {
+                            fileLink.FsFileInfos = links;
+                            if (links.Count == 1)
+                            {
+                                break;
                             }
                         }
                     }
@@ -182,6 +249,10 @@ namespace TorrentHardLinkHelper.Locate
         {
             foreach (TorrentFileLink fileLink in this._torrentFileLinks)
             {
+                if (this._fileLocating != null)
+                {
+                    this._fileLocating.Invoke();
+                }
                 if (fileLink.State == LinkState.Located)
                 {
                     continue;
