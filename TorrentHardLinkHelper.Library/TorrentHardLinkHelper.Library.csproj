@@ -51,8 +51,10 @@
     <Compile Include="Common\Toolbox.cs" />
     <Compile Include="Common\UriHelper.cs" />
     <Compile Include="HardLink\HardLinkHelper.cs" />
+    <Compile Include="Locate\FileLinkPiece.cs" />
     <Compile Include="Locate\FileSystemFileInfo.cs" />
     <Compile Include="Locate\FileSystemFileSearcher.cs" />
+    <Compile Include="Locate\HashFileLinkPieces.cs" />
     <Compile Include="Locate\LinkState.cs" />
     <Compile Include="Locate\LocateResult.cs" />
     <Compile Include="Locate\LocateState.cs" />

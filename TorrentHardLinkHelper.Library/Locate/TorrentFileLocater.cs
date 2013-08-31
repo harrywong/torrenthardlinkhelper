@@ -9,126 +9,6 @@ namespace TorrentHardLinkHelper.Locate
 {
     public class TorrentFileLocater
     {
-        private class FileLinkPiece
-        {
-            public TorrentFileLink FileLink { get; set; }
-            public ulong StartPos { get; set; }
-            public ulong ReadLength { get; set; }
-
-            public override string ToString()
-            {
-                return this.FileLink + ", startpos: " + this.StartPos + ", length: " + this.ReadLength;
-            }
-        }
-
-        private class HashFileLinkPieces
-        {
-            private int _result;
-            private readonly IList<FileLinkPiece> _fileLinkPieces;
-            private readonly Torrent _torrent;
-            private readonly int _pieceIndex;
-            private string _validPattern;
-            private List<string> _patterns;
-            private int _finishedCount;
-
-            public HashFileLinkPieces(Torrent torrent, int pieceIndex, IList<FileLinkPiece> fileLinkPieces)
-            {
-                this._pieceIndex = pieceIndex;
-                this._fileLinkPieces = fileLinkPieces;
-                this._result = -1;
-                this._torrent = torrent;
-            }
-
-            public string Run()
-            {
-                if (_fileLinkPieces.Any(c => c.FileLink.FsFileInfos.Count == 0))
-                {
-                    return null;
-                }
-                this.Run(0, "");
-                return this._validPattern;
-            }
-
-            private void FindPatterns(int index, string pattern)
-            {
-                if (this._result != -1)
-                {
-                    return;
-                }
-                if (index < this._fileLinkPieces.Count)
-                {
-                    for (int i = 0; i < this._fileLinkPieces[index].FileLink.FsFileInfos.Count; i++)
-                    {
-                        string nextPattern = pattern + i + ',';
-                        int nextIndex = index + 1;
-                        FindPatterns(nextIndex, nextPattern);
-                    }
-                }
-                else
-                {
-                    this._patterns.Add(pattern);
-                }
-            }
-
-            private void CheckPattern(string pattern)
-            {
-
-            }
-
-            private void CheckPetternFinish(IAsyncResult ar)
-            {
-
-            }
-
-            private void Run(int index, string pattern)
-            {
-                if (this._result != -1)
-                {
-                    return;
-                }
-                if (index < this._fileLinkPieces.Count)
-                {
-                    for (int i = 0; i < this._fileLinkPieces[index].FileLink.FsFileInfos.Count; i++)
-                    {
-                        if (this._fileLinkPieces[index].FileLink.TorrentFile.StartPieceIndex == this._pieceIndex &&
-                            this._fileLinkPieces[index].FileLink.TorrentFile.EndPieceIndex == this._pieceIndex)
-                        {
-                            if (this._fileLinkPieces[index].FileLink.FsFileInfos[i].Located)
-                            {
-                                continue;
-                            }
-                        }
-                        string nextPattern = pattern + i + ',';
-                        int nextIndex = index + 1;
-                        Run(nextIndex, nextPattern);
-                    }
-                }
-                else
-                {
-                    var pieceStream = new MemoryStream(this._torrent.PieceLength);
-                    for (int i = 0; i < this._fileLinkPieces.Count; i++)
-                    {
-                        int fileIndex = int.Parse(pattern.Split(',')[i]);
-                        FileStream fileStream =
-                            File.OpenRead(this._fileLinkPieces[i].FileLink.FsFileInfos[fileIndex].FilePath);
-                        var buffer = new byte[this._fileLinkPieces[i].ReadLength];
-                        fileStream.Position = (long)this._fileLinkPieces[i].StartPos;
-                        fileStream.Read(buffer, 0, buffer.Length);
-                        pieceStream.Write(buffer, 0, buffer.Length);
-                    }
-
-                    var sha1 = HashAlgoFactory.Create<SHA1>();
-                    byte[] hash = sha1.ComputeHash(pieceStream.ToArray());
-                    if (this._torrent.Pieces.IsValid(hash, this._pieceIndex))
-                    {
-                        this._result = 1;
-                        this._validPattern = pattern;
-                    }
-                }
-            }
-        }
-
-
         private readonly IList<FileSystemFileInfo> _fsfiFileInfos;
         private readonly IList<TorrentFileLink> _torrentFileLinks;
         private readonly Dictionary<int, bool> _pieceCheckedReusltsDictionary;
@@ -177,14 +57,6 @@ namespace TorrentHardLinkHelper.Locate
             return new LocateResult(this._torrentFileLinks);
         }
 
-        public void PorcessTorrentFile()
-        {
-            foreach (TorrentFile torrentFile in this._torrent.Files)
-            {
-
-            }
-        }
-
         private void FindTorrentFileLinks()
         {
             foreach (TorrentFile torrentFile in this._torrent.Files)
@@ -199,8 +71,9 @@ namespace TorrentHardLinkHelper.Locate
                 }
                 if (fileLink.FsFileInfos.Count > 1)
                 {
-                    var torrentFilePathParts = torrentFile.Path.Split('\\');
-                    for (int i = 0; i < torrentFilePathParts.Length; i++)
+                    var torrentFilePathParts = torrentFile.Path.Split('\\').ToList();
+                    torrentFilePathParts.Insert(0, this._torrent.Name);
+                    for (int i = 0; i < torrentFilePathParts.Count; i++)
                     {
                         var links = new List<FileSystemFileInfo>();
                         foreach (var fileInfo in fileLink.FsFileInfos)
@@ -208,7 +81,7 @@ namespace TorrentHardLinkHelper.Locate
                             var filePathPaths = fileInfo.FilePath.Split('\\');
                             if (filePathPaths.Length > i + 1 &&
                                 filePathPaths[filePathPaths.Length - i - 1].ToUpperInvariant() ==
-                                torrentFilePathParts[torrentFilePathParts.Length - i - 1].ToUpperInvariant())
+                                torrentFilePathParts[torrentFilePathParts.Count - i - 1].ToUpperInvariant())
                             {
                                 links.Add(fileInfo);
                             }
