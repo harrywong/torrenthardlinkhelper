@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Text;
 using TorrentHardLinkHelper.Locate;
 
 namespace TorrentHardLinkHelper.HardLink
@@ -12,11 +13,12 @@ namespace TorrentHardLinkHelper.HardLink
         private readonly string _folderName;
         private readonly IList<TorrentFileLink> _links;
         private readonly long _copyLimitSize;
+        private StringBuilder _builder;
 
         public HardLinkHelper(IList<TorrentFileLink> links, int copyLimitSize)
         {
             this._links = links;
-            this._copyLimitSize = copyLimitSize*1024L;
+            this._copyLimitSize = copyLimitSize * 1024L;
         }
 
         public HardLinkHelper(IList<TorrentFileLink> links, int copyLimitSize, string folderName, string baseFolder)
@@ -33,6 +35,14 @@ namespace TorrentHardLinkHelper.HardLink
             {
                 Directory.CreateDirectory(rootFolder);
             }
+            this._builder = new StringBuilder();
+            this._builder.AppendLine("::==============================================::");
+            this._builder.AppendLine(":: Torrent Hard-Link Helper v0.6");
+            this._builder.AppendLine(":: By Harry Wong(harrywong@live.com), 2013");
+            this._builder.AppendLine("::");
+            this._builder.AppendLine(":: Created at " + DateTime.Now);
+            this._builder.AppendLine("::==============================================::");
+            this._builder.AppendLine("::.");
             foreach (var link in this._links)
             {
                 if (link.LinkedFsFileInfo == null)
@@ -62,10 +72,12 @@ namespace TorrentHardLinkHelper.HardLink
                     Copy(link.LinkedFsFileInfo.FilePath, targetFile);
                 }
             }
+            File.WriteAllText(Path.Combine(rootFolder, "!hard-link.cmd"), this._builder.ToString());
         }
 
         private void CreateHarkLink(string source, string target)
         {
+            this._builder.AppendLine(string.Format("fsutil hardlink create \"{0}\" \"{1}\"", target, source));
             var procStartInfo =
                 new ProcessStartInfo("cmd",
                     "/c " + string.Format("fsutil hardlink create \"{0}\" \"{1}\"", target, source));
@@ -84,6 +96,7 @@ namespace TorrentHardLinkHelper.HardLink
 
         private void Copy(string source, string target)
         {
+            this._builder.AppendLine(string.Format("copy /y \"{0}\" \"{1}\"", source, target));
             var procStartInfo =
                 new ProcessStartInfo("cmd",
                     "/c " + string.Format("copy /y \"{0}\" \"{1}\"", source, target));
