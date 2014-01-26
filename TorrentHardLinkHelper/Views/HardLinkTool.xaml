@@ -1,0 +1,33 @@
+﻿<Window x:Class="TorrentHardLinkHelper.Views.HardLinkTool"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        DataContext="{Binding Source={StaticResource Locator}, Path=HardLinkTool}"
+        Title="HardLinkTool" Height="261" Width="601">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="Auto"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <TextBlock  FontWeight="Bold" Grid.Row="0" Grid.ColumnSpan="3" Margin="10" TextWrapping="Wrap" >This tool help create a copy of a folder, the size of file below 1M will be copyed, others will be hard-linked.</TextBlock>
+        <Label Grid.Row="1" HorizontalContentAlignment="Right" VerticalAlignment="Center">Source Folder</Label>
+        <Label Grid.Row="2" HorizontalContentAlignment="Right" VerticalAlignment="Center">Target Parent Folder</Label>
+        <Label Grid.Row="3" HorizontalContentAlignment="Right" VerticalAlignment="Center">Target Folder Name</Label>
+        <TextBox Grid.Row="1" Grid.Column="1" Margin="5" VerticalContentAlignment="Center" Text="{Binding SourceFolder}"></TextBox>
+        <TextBox Grid.Row="2" Grid.Column="1" Margin="5" VerticalContentAlignment="Center" Text="{Binding ParentFolder}"></TextBox>
+        <TextBox Grid.Row="3" Grid.Column="1" Margin="5" VerticalContentAlignment="Center" Text="{Binding FolderName}"></TextBox>
+        <Button Grid.Row="1" Grid.Column="2"  Content="Select" Margin="5" Padding="10,5" Command="{Binding SelectSourceFolderCommand}"></Button>
+        <Button Grid.Row="2" Grid.Column="2"  Content="Select" Margin="5" Padding="10,5" Command="{Binding SelectParentFolderCommand}"></Button>
+        <Button Grid.Row="3" Grid.Column="2"  Content="Default" Margin="5" Padding="10,5" Command="{Binding DefaultCommand}"></Button>
+        <StackPanel Grid.Row="4" Grid.ColumnSpan="3" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="10" Orientation="Horizontal">
+            <Button Content="Hard-Link" Padding="10,5" Margin="5" Command="{Binding LinkCommand}"></Button>
+        </StackPanel>
+    </Grid>
+</Window>

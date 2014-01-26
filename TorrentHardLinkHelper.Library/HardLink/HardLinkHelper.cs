@@ -9,41 +9,70 @@ namespace TorrentHardLinkHelper.HardLink
 {
     public class HardLinkHelper
     {
-        private readonly string _outputBaseFolder;
-        private readonly string _folderName;
-        private readonly IList<TorrentFileLink> _links;
-        private readonly long _copyLimitSize;
         private StringBuilder _builder;
 
-        public HardLinkHelper(IList<TorrentFileLink> links, int copyLimitSize)
+        public void HardLink(string sourceFolder, string targetParentFolder, string folderName, int copyLimitSize)
         {
-            this._links = links;
-            this._copyLimitSize = copyLimitSize * 1024L;
-        }
-
-        public HardLinkHelper(IList<TorrentFileLink> links, int copyLimitSize, string folderName, string baseFolder)
-            : this(links, copyLimitSize)
-        {
-            this._folderName = folderName;
-            this._outputBaseFolder = baseFolder;
-        }
-
-        public void HardLink()
-        {
-            string rootFolder = Path.Combine(this._outputBaseFolder, this._folderName);
+            string rootFolder = Path.Combine(targetParentFolder, folderName);
             if (!Directory.Exists(rootFolder))
             {
                 Directory.CreateDirectory(rootFolder);
             }
             this._builder = new StringBuilder();
             this._builder.AppendLine("::==============================================::");
-            this._builder.AppendLine(":: Torrent Hard-Link Helper v0.6");
-            this._builder.AppendLine(":: By Harry Wong(harrywong@live.com), 2013");
+            this._builder.AppendLine(":: Torrent Hard-Link Helper v0.7");
+            this._builder.AppendLine(":: By Harry Wong(harrywong@live.com), 2013-2014");
             this._builder.AppendLine("::");
             this._builder.AppendLine(":: Created at " + DateTime.Now);
             this._builder.AppendLine("::==============================================::");
             this._builder.AppendLine("::.");
-            foreach (var link in this._links)
+
+            this.SearchFolder(sourceFolder, rootFolder, copyLimitSize);
+            File.WriteAllText(Path.Combine(rootFolder, "!hard-link.cmd"), this._builder.ToString());
+        }
+
+        private void SearchFolder(string folder, string targetParentFolder, int copyLimitSize)
+        {
+            foreach (var file in Directory.GetFiles(folder))
+            {
+                string targetFile = Path.Combine(targetParentFolder, Path.GetFileName(file));
+                var fileInfo = new FileInfo(file);
+                if (fileInfo.Length >= copyLimitSize)
+                {
+                    CreateHarkLink(file, targetFile);
+                }
+                else
+                {
+                    Copy(file, targetFile);
+                }
+            }
+            foreach (var subFolder in Directory.GetDirectories(folder))
+            {
+                string targetSubFolder = Path.Combine(targetParentFolder, Path.GetFileName(subFolder));
+                if (!Directory.Exists(targetSubFolder))
+                {
+                    Directory.CreateDirectory(targetSubFolder);
+                }
+                SearchFolder(subFolder, targetSubFolder, copyLimitSize);
+            }
+        }
+
+        public void HardLink(IList<TorrentFileLink> links, int copyLimitSize, string folderName, string baseFolde)
+        {
+            string rootFolder = Path.Combine(baseFolde, folderName);
+            if (!Directory.Exists(rootFolder))
+            {
+                Directory.CreateDirectory(rootFolder);
+            }
+            this._builder = new StringBuilder();
+            this._builder.AppendLine("::==============================================::");
+            this._builder.AppendLine(":: Torrent Hard-Link Helper v0.7");
+            this._builder.AppendLine(":: By Harry Wong(harrywong@live.com), 2013-2014");
+            this._builder.AppendLine("::");
+            this._builder.AppendLine(":: Created at " + DateTime.Now);
+            this._builder.AppendLine("::==============================================::");
+            this._builder.AppendLine("::.");
+            foreach (var link in links)
             {
                 if (link.LinkedFsFileInfo == null)
                 {
@@ -63,7 +92,7 @@ namespace TorrentHardLinkHelper.HardLink
                 }
                 string targetFile = Path.Combine(rootFolder, link.TorrentFile.Path);
 
-                if (link.TorrentFile.Length > this._copyLimitSize)
+                if (link.TorrentFile.Length >= copyLimitSize)
                 {
                     CreateHarkLink(link.LinkedFsFileInfo.FilePath, targetFile);
                 }

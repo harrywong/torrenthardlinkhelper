@@ -7,11 +7,13 @@ using System.Windows;
 using System.Windows.Controls;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using Microsoft.Practices.ServiceLocation;
 using Ookii.Dialogs.Wpf;
 using TorrentHardLinkHelper.HardLink;
 using TorrentHardLinkHelper.Locate;
 using TorrentHardLinkHelper.Models;
 using TorrentHardLinkHelper.Torrents;
+using TorrentHardLinkHelper.Views;
 
 namespace TorrentHardLinkHelper.ViewModels
 {
@@ -47,6 +49,7 @@ namespace TorrentHardLinkHelper.ViewModels
         private RelayCommand<TreeView> _expandCommand;
         private RelayCommand<TreeView> _collapseCommand;
         private RelayCommand<SelectionChangedEventArgs> _outputNameTypeChangedCommand;
+        private RelayCommand _hardlinkToolCommand;
 
         public MainViewModel()
         {
@@ -112,6 +115,12 @@ namespace TorrentHardLinkHelper.ViewModels
 
             this._expandCommand = new RelayCommand<TreeView>(tv => { tv.ItemContainerStyle = this._expandAllStyle; });
             this._collapseCommand = new RelayCommand<TreeView>(tv => { tv.ItemContainerStyle = this._collapseAllStyle; });
+
+            this._hardlinkToolCommand = new RelayCommand(() =>
+            {
+                var tool = new HardLinkTool();
+                tool.ShowDialog();
+            });
         }
 
         private void InitStyles()
@@ -234,9 +243,9 @@ namespace TorrentHardLinkHelper.ViewModels
             }
 
             this.UpdateStatusFormat("Linking...");
-            var helper = new HardLinkHelper(this._locateResult.TorrentFileLinks, this._copyLimitSize, this._outputName,
+            var helper = new HardLinkHelper();
+            helper.HardLink(this._locateResult.TorrentFileLinks, this._copyLimitSize, this._outputName,
                 this._outputBaseFolder);
-            helper.HardLink();
             this.UpdateStatusFormat("Done.");
             Process.Start("explorer.exe", Path.Combine(this._outputBaseFolder, this._outputName));
         }
@@ -356,6 +365,12 @@ namespace TorrentHardLinkHelper.ViewModels
         public RelayCommand<TreeView> CollapseAllCommand
         {
             get { return this._collapseCommand; }
+        }
+
+        public RelayCommand HardlinkToolCommand
+        {
+            get { return _hardlinkToolCommand; }
+            set { _hardlinkToolCommand = value; }
         }
 
         #endregion

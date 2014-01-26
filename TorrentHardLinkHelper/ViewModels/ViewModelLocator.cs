@@ -16,6 +16,7 @@ namespace TorrentHardLinkHelper.ViewModels
         {
             var container = new SimpleIoc();
             container.Register<MainViewModel>();
+            container.Register<HardLinkToolViewModel>();
 
             //var builder = new ContainerBuilder();
             //builder.RegisterType<MainViewModel>();
@@ -29,6 +30,11 @@ namespace TorrentHardLinkHelper.ViewModels
         public MainViewModel Main
         {
             get { return ServiceLocator.Current.GetInstance<MainViewModel>(); }
+        }
+
+        public HardLinkToolViewModel HardLinkTool
+        {
+            get { return ServiceLocator.Current.GetInstance<HardLinkToolViewModel>(); }
         }
 
         public static void Cleanup()
