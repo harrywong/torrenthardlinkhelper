@@ -122,6 +122,10 @@ namespace TorrentHardLinkHelper.Models
                 {
                     foreach (var fsInfo in fsFileInfos)
                     {
+                        if (fsInfo == null)
+                        {
+                            continue;
+                        }
                         if (fsInfo.FilePath == entity.FullName)
                         {
                             entity.Located = true;

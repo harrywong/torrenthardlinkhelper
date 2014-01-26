@@ -17,7 +17,7 @@ namespace TorrentHardLinkHelper.ViewModels
 {
     public class MainViewModel : ViewModelBase
     {
-        private static readonly IList<string> _outputNameTypes = new[] {"Torrent Name", "Torrent Title", "Custom"};
+        private static readonly IList<string> _outputNameTypes = new[] { "Torrent Name", "Torrent Title", "Custom" };
 
         private string _torrentFile;
         private string _sourceFolder;
@@ -83,7 +83,7 @@ namespace TorrentHardLinkHelper.ViewModels
                 {
                     this.Set(() => this.SourceFolder, ref this._sourceFolder, dialog.SelectedPath);
                     this.Set(() => this.FileSystemEntityModel, ref this._fileSystemEntityModel,
-                        new[] {EntityModel.Load(this._sourceFolder)});
+                        new[] { EntityModel.Load(this._sourceFolder) });
                 }
             });
 
@@ -116,8 +116,8 @@ namespace TorrentHardLinkHelper.ViewModels
 
         private void InitStyles()
         {
-            this._expandAllStyle = new Style(typeof (TreeViewItem));
-            this._collapseAllStyle = new Style(typeof (TreeViewItem));
+            this._expandAllStyle = new Style(typeof(TreeViewItem));
+            this._collapseAllStyle = new Style(typeof(TreeViewItem));
 
             this._expandAllStyle.Setters.Add(new Setter(TreeViewItem.IsExpandedProperty, true));
             this._collapseAllStyle.Setters.Add(new Setter(TreeViewItem.IsExpandedProperty, false));
@@ -139,7 +139,7 @@ namespace TorrentHardLinkHelper.ViewModels
                 this._torrent = Torrent.Load(this._torrentFile);
                 this.ChangeOutputFolderNmae(this._outputNameType);
                 this.Set(() => this.TorrentEntityModel, ref this._torrentEntityModel,
-                    new[] {EntityModel.Load(this._torrent)});
+                    new[] { EntityModel.Load(this._torrent) });
             }
             catch (Exception ex)
             {
@@ -186,23 +186,31 @@ namespace TorrentHardLinkHelper.ViewModels
         private void AnalyseFinish(IAsyncResult ar)
         {
             var func = ar.AsyncState as Func<LocateResult>;
-            LocateResult result = func.EndInvoke(ar);
+            try
+            {
+                LocateResult result = func.EndInvoke(ar);
 
-            this.UpdateStatusFormat("Successfully located {0} of {1} file(s). Mathched {2} of {3} file(s) on disk.",
-                result.LocatedCount,
-                result.LocatedCount + result.UnlocatedCount,
-                result.TorrentFileLinks.Where(c => c.State == LinkState.Located)
-                    .Select(c => c.LinkedFsFileInfo.FilePath)
-                    .Distinct()
-                    .Count(), this._fileSystemFileInfos.Count);
-            this._locateResult = result;
+                this.UpdateStatusFormat("Successfully located {0} of {1} file(s). Matched {2} of {3} file(s) on disk.",
+                    result.LocatedCount,
+                    result.LocatedCount + result.UnlocatedCount,
+                    result.TorrentFileLinks.Where(c => c.State == LinkState.Located)
+                        .Where(c => c.LinkedFsFileInfo != null)
+                        .Select(c => c.LinkedFsFileInfo.FilePath)
+                        .Distinct()
+                        .Count(), this._fileSystemFileInfos.Count);
+                this._locateResult = result;
 
-            EntityModel.Update(this._fileSystemEntityModel[0],
-                result.TorrentFileLinks.Where(c => c.State == LinkState.Located).Select(c => c.LinkedFsFileInfo));
-            this.RaisePropertyChanged(() => this.FileSystemEntityModel);
+                EntityModel.Update(this._fileSystemEntityModel[0],
+                    result.TorrentFileLinks.Where(c => c.State == LinkState.Located).Select(c => c.LinkedFsFileInfo));
+                this.RaisePropertyChanged(() => this.FileSystemEntityModel);
 
-            this.Set(() => this.TorrentEntityModel, ref this._torrentEntityModel,
-                new[] {EntityModel.Load(this._torrent.Name, result)});
+                this.Set(() => this.TorrentEntityModel, ref this._torrentEntityModel,
+                    new[] { EntityModel.Load(this._torrent.Name, result) });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
         }
 
         private LocateResult Locate()

@@ -28,9 +28,9 @@
             <Label Grid.Row="0" Grid.Column="0" Content="Torrent File:" HorizontalContentAlignment="Right" VerticalAlignment="Center"></Label>
             <Label Grid.Row="1" Grid.Column="0" Content="Source Folder:" HorizontalContentAlignment="Right" VerticalAlignment="Center"></Label>
             <Label Grid.Row="2" Grid.Column="0" Content="Output BaseFolder:" HorizontalContentAlignment="Right" VerticalAlignment="Center"></Label>
-            <TextBox Grid.Row="0" Grid.Column="1" Margin="5" VerticalContentAlignment="Center" IsReadOnly="True" Text="{Binding TorrentFile}"></TextBox>
-            <TextBox Grid.Row="1" Grid.Column="1" Margin="5" VerticalContentAlignment="Center" IsReadOnly="True" Text="{Binding SourceFolder}"></TextBox>
-            <TextBox Grid.Row="2" Grid.Column="1" Margin="5" VerticalContentAlignment="Center" IsReadOnly="True" Text="{Binding OutputBaseFolder}"></TextBox>
+            <TextBox Grid.Row="0" Grid.Column="1" Margin="5" VerticalContentAlignment="Center" Text="{Binding TorrentFile}"></TextBox>
+            <TextBox Grid.Row="1" Grid.Column="1" Margin="5" VerticalContentAlignment="Center" Text="{Binding SourceFolder}"></TextBox>
+            <TextBox Grid.Row="2" Grid.Column="1" Margin="5" VerticalContentAlignment="Center" Text="{Binding OutputBaseFolder}"></TextBox>
             <Button Grid.Row="0" Grid.Column="2" Content="Select" Margin="5" Padding="10,5" Command="{Binding SelectTorrentFileCommand}"></Button>
             <Button Grid.Row="1" Grid.Column="2" Content="Select" Margin="5" Padding="10,5" Command="{Binding SelectSourceFolder}"></Button>
             <Button Grid.Row="2" Grid.Column="2" Content="Select" Margin="5" Padding="10,5" Command="{Binding SelectOutputBaseFolder}"></Button>
@@ -55,11 +55,11 @@
             <TreeView x:Name="TvFileSystem" Grid.Row="1" Grid.Column="0" Margin="5" ItemsSource="{Binding FileSystemEntityModel}" ItemTemplate="{StaticResource EntityTemplate}"></TreeView>
             <TreeView x:Name="TvTorrent" Grid.Row="1" Grid.Column="1" Margin="5" ItemsSource="{Binding TorrentEntityModel}" ItemTemplate="{StaticResource EntityTemplate}"></TreeView>
             <StackPanel Grid.Row="2" Grid.Column="0" Margin="5" Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Content="Expande All" Margin="5" Command="{Binding ExpandAllCommand}" CommandParameter="{Binding ElementName=TvFileSystem}"></Button>
+                <Button Content="Expand All" Margin="5" Command="{Binding ExpandAllCommand}" CommandParameter="{Binding ElementName=TvFileSystem}"></Button>
                 <Button Content="Collapse All" Margin="5" Command="{Binding CollapseAllCommand}" CommandParameter="{Binding ElementName=TvFileSystem}"></Button>
             </StackPanel>
             <StackPanel Grid.Row="2" Grid.Column="1" Margin="5" Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Content="Expande All" Margin="5" Command="{Binding ExpandAllCommand}" CommandParameter="{Binding ElementName=TvTorrent}"></Button>
+                <Button Content="Expand All" Margin="5" Command="{Binding ExpandAllCommand}" CommandParameter="{Binding ElementName=TvTorrent}"></Button>
                 <Button Content="Collapse All" Margin="5" Command="{Binding CollapseAllCommand}" CommandParameter="{Binding ElementName=TvTorrent}"></Button>
             </StackPanel>
         </Grid>

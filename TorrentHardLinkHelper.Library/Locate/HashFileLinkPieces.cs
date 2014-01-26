@@ -76,6 +76,11 @@ namespace TorrentHardLinkHelper.Locate
             }
         }
 
+        private void GroupFiles()
+        {
+            
+        }
+
         private void Run(int index, string pattern)
         {
             if (this._result == 1)
@@ -131,6 +136,5 @@ namespace TorrentHardLinkHelper.Locate
             fileStream.Close();
             return Convert.ToBase64String(hash);
         }
-
     }
 }
