@@ -30,7 +30,7 @@ namespace TorrentHardLinkHelper.ViewModels
                 var dialog = new VistaFolderBrowserDialog();
                 dialog.ShowNewFolderButton = true;
                 dialog.ShowDialog();
-                if (dialog.SelectedPath != null)
+                if (!string.IsNullOrWhiteSpace(dialog.SelectedPath))
                 {
                     this.Set(() => this.SourceFolder, ref this._sourceFolder, dialog.SelectedPath);
                     this.Set(() => this.ParentFolder, ref this._parentFolder, Directory.GetParent(dialog.SelectedPath).FullName);
