@@ -34,7 +34,7 @@ namespace TorrentHardLinkHelper.ViewModels
                 {
                     this.Set(() => this.SourceFolder, ref this._sourceFolder, dialog.SelectedPath);
                     this.Set(() => this.ParentFolder, ref this._parentFolder, Directory.GetParent(dialog.SelectedPath).FullName);
-                    this.Set(() => this.FolderName, ref this._folderName, dialog.SelectedPath + "_Copy");
+                    this.Set(() => this.FolderName, ref this._folderName, Path.GetFileName(dialog.SelectedPath) + "_Copy");
                 }
             });
 

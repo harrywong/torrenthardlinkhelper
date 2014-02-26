@@ -10,29 +10,44 @@ namespace TorrentHardLinkHelper.HardLink
     public class HardLinkHelper
     {
         private StringBuilder _builder;
+        private List<string> _createdFolders;
 
         public void HardLink(string sourceFolder, string targetParentFolder, string folderName, int copyLimitSize)
         {
-            string rootFolder = Path.Combine(targetParentFolder, folderName);
-            if (!Directory.Exists(rootFolder))
-            {
-                Directory.CreateDirectory(rootFolder);
-            }
+
             this._builder = new StringBuilder();
+            this._builder.AppendLine("chcp 65001");
             this._builder.AppendLine("::==============================================::");
-            this._builder.AppendLine(":: Torrent Hard-Link Helper v0.7");
+            this._builder.AppendLine(":: Torrent Hard-Link Helper v0.8");
             this._builder.AppendLine(":: By Harry Wong(harrywong@live.com), 2013-2014");
             this._builder.AppendLine("::");
             this._builder.AppendLine(":: Created at " + DateTime.Now);
             this._builder.AppendLine("::==============================================::");
             this._builder.AppendLine("::.");
 
+            string rootFolder = Path.Combine(targetParentFolder, folderName);
+            if (!Directory.Exists(rootFolder))
+            {
+                CreateFolder(rootFolder);
+            }
+            if (!Directory.Exists(targetParentFolder))
+            {
+                CreateFolder(targetParentFolder);
+            }
             this.SearchFolder(sourceFolder, rootFolder, copyLimitSize);
-            File.WriteAllText(Path.Combine(rootFolder, "!hard-link.cmd"), this._builder.ToString());
+            File.WriteAllText(Path.Combine(rootFolder, "!hard-link.cmd"), this._builder.ToString(), Encoding.UTF8);
         }
 
         private void SearchFolder(string folder, string targetParentFolder, int copyLimitSize)
         {
+            if (this._createdFolders == null)
+            {
+                this._createdFolders = new List<string>();
+            }
+            if (this._createdFolders.Contains(folder))
+            {
+                return;
+            }
             foreach (var file in Directory.GetFiles(folder))
             {
                 string targetFile = Path.Combine(targetParentFolder, Path.GetFileName(file));
@@ -51,7 +66,8 @@ namespace TorrentHardLinkHelper.HardLink
                 string targetSubFolder = Path.Combine(targetParentFolder, Path.GetFileName(subFolder));
                 if (!Directory.Exists(targetSubFolder))
                 {
-                    Directory.CreateDirectory(targetSubFolder);
+                    this.CreateFolder(targetSubFolder);
+                    this._createdFolders.Add(targetSubFolder);
                 }
                 SearchFolder(subFolder, targetSubFolder, copyLimitSize);
             }
@@ -60,18 +76,20 @@ namespace TorrentHardLinkHelper.HardLink
         public void HardLink(IList<TorrentFileLink> links, int copyLimitSize, string folderName, string baseFolde)
         {
             string rootFolder = Path.Combine(baseFolde, folderName);
-            if (!Directory.Exists(rootFolder))
-            {
-                Directory.CreateDirectory(rootFolder);
-            }
+
             this._builder = new StringBuilder();
+            this._builder.AppendLine("chcp 65001");
             this._builder.AppendLine("::==============================================::");
-            this._builder.AppendLine(":: Torrent Hard-Link Helper v0.7");
+            this._builder.AppendLine(":: Torrent Hard-Link Helper v0.8");
             this._builder.AppendLine(":: By Harry Wong(harrywong@live.com), 2013-2014");
             this._builder.AppendLine("::");
             this._builder.AppendLine(":: Created at " + DateTime.Now);
             this._builder.AppendLine("::==============================================::");
             this._builder.AppendLine("::.");
+            if (!Directory.Exists(rootFolder))
+            {
+                this.CreateFolder(rootFolder);
+            }
             foreach (var link in links)
             {
                 if (link.LinkedFsFileInfo == null)
@@ -87,7 +105,7 @@ namespace TorrentHardLinkHelper.HardLink
                     string targetPath = Path.Combine(targetPathParts);
                     if (!Directory.Exists(targetPath))
                     {
-                        Directory.CreateDirectory(targetPath);
+                        this.CreateFolder(targetPath);
                     }
                 }
                 string targetFile = Path.Combine(rootFolder, link.TorrentFile.Path);
@@ -101,7 +119,7 @@ namespace TorrentHardLinkHelper.HardLink
                     Copy(link.LinkedFsFileInfo.FilePath, targetFile);
                 }
             }
-            File.WriteAllText(Path.Combine(rootFolder, "!hard-link.cmd"), this._builder.ToString());
+            File.WriteAllText(Path.Combine(rootFolder, "!hard-link.cmd"), this._builder.ToString(), Encoding.UTF8);
         }
 
         private void CreateHarkLink(string source, string target)
@@ -140,6 +158,12 @@ namespace TorrentHardLinkHelper.HardLink
             Process proc = new Process();
             proc.StartInfo = procStartInfo;
             proc.Start();
+        }
+
+        private void CreateFolder(string path)
+        {
+            this._builder.AppendLine(string.Format("mkdir  \"{0}\"", path));
+            Directory.CreateDirectory(path);
         }
     }
 }
