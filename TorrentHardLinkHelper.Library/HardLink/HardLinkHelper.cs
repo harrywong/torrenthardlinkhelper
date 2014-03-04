@@ -35,7 +35,8 @@ namespace TorrentHardLinkHelper.HardLink
                 CreateFolder(targetParentFolder);
             }
             this.SearchFolder(sourceFolder, rootFolder, copyLimitSize);
-            File.WriteAllText(Path.Combine(rootFolder, "!hard-link.cmd"), this._builder.ToString(), Encoding.UTF8);
+            var utf8bom = new UTF8Encoding(false);
+            File.WriteAllText(Path.Combine(rootFolder, "!hard-link.cmd"), this._builder.ToString(), utf8bom);
         }
 
         private void SearchFolder(string folder, string targetParentFolder, int copyLimitSize)
