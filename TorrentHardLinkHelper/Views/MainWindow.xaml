@@ -2,7 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
-        xmlns:mvvm="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Extras.WPF4"
+        xmlns:mvvm="http://www.galasoft.ch/mvvmlight"
         xmlns:models="clr-namespace:TorrentHardLinkHelper.Models"
         DataContext="{Binding Source={StaticResource Locator}, Path=Main}"
         Title="Torrent HardLink Helper v0.8" Height="700" Width="680">
