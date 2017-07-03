@@ -244,8 +244,8 @@ namespace TorrentHardLinkHelper.ViewModels
                 return;
             }
             if (this._unlocatedCount != 0) {
-                MessageBoxResult result = MessageBox.Show(this._unlocatedCount + " unlocated files, hard link anyway?", "Confirm", MessageBoxButton.OKCancel, MessageBoxImage.Warning, MessageBoxResult.Cancel);
-                if (result != MessageBoxResult.Yes) {
+                MessageBoxResult result = MessageBox.Show(this._unlocatedCount + " files unlocated, hard link anyway?", "Confirm", MessageBoxButton.OKCancel, MessageBoxImage.Warning, MessageBoxResult.Cancel);
+                if (result != MessageBoxResult.OK) {
                     return;
                 }
             }
