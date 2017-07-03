@@ -19,7 +19,7 @@ namespace TorrentHardLinkHelper.ViewModels
 {
     public class MainViewModel : ViewModelBase
     {
-        private static readonly IList<string> _outputNameTypes = new[] { "Torrent Name", "Torrent Title", "Custom" };
+        private static readonly IList<string> _outputNameTypes = new[] { "Torrent Title", "Torrent Name", "Custom" };
 
         private string _torrentFile;
         private string _sourceFolder;
@@ -246,6 +246,9 @@ namespace TorrentHardLinkHelper.ViewModels
             var helper = new HardLinkHelper();
             helper.HardLink(this._locateResult.TorrentFileLinks, this._copyLimitSize, this._outputName,
                 this._outputBaseFolder);
+            // copy .torrent file
+            string targetTorrentFile = Path.Combine(Path.Combine(this._outputBaseFolder, this._outputName), Path.GetFileName(_torrentFile));
+            helper.Copy(_torrentFile, targetTorrentFile);
             this.UpdateStatusFormat("Done.");
             Process.Start("explorer.exe", Path.Combine(this._outputBaseFolder, this._outputName));
         }
