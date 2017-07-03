@@ -32,6 +32,7 @@ namespace TorrentHardLinkHelper.ViewModels
         private int _maxProcess;
         private int _curProcess;
         private Torrent _torrent;
+        private int _unlocatedCount = -1;
         private IList<FileSystemFileInfo> _fileSystemFileInfos;
         private IList<EntityModel> _fileSystemEntityModel;
         private IList<EntityModel> _torrentEntityModel;
@@ -208,6 +209,7 @@ namespace TorrentHardLinkHelper.ViewModels
                         .Distinct()
                         .Count(), this._fileSystemFileInfos.Count);
                 this._locateResult = result;
+                this._unlocatedCount = result.UnlocatedCount;
 
                 EntityModel.Update(this._fileSystemEntityModel[0],
                     result.TorrentFileLinks.Where(c => c.State == LinkState.Located).Select(c => c.LinkedFsFileInfo));
@@ -240,6 +242,12 @@ namespace TorrentHardLinkHelper.ViewModels
                 this.UpdateStatusFormat(
                     "Link failed, the output basefolder and the source folder must be in the same driver!");
                 return;
+            }
+            if (this._unlocatedCount != 0) {
+                MessageBoxResult result = MessageBox.Show(this._unlocatedCount + " unlocated files, hard link anyway?", "Confirm", MessageBoxButton.OKCancel, MessageBoxImage.Warning, MessageBoxResult.Cancel);
+                if (result != MessageBoxResult.Yes) {
+                    return;
+                }
             }
 
             this.UpdateStatusFormat("Linking...");
