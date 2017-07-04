@@ -142,7 +142,7 @@ namespace TorrentHardLinkHelper.HardLink
             proc.Start();
         }
 
-        private void Copy(string source, string target)
+        public void Copy(string source, string target)
         {
             this._builder.AppendLine(string.Format("copy /y \"{0}\" \"{1}\"", source, target));
             var procStartInfo =
