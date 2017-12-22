@@ -1,5 +1,5 @@
-using Microsoft.Practices.ServiceLocation;
 using GalaSoft.MvvmLight.Ioc;
+using Microsoft.Practices.ServiceLocation;
 
 namespace TorrentHardLinkHelper.ViewModels
 {

@@ -7,7 +7,6 @@ using System.Windows;
 using System.Windows.Controls;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
-using Microsoft.Practices.ServiceLocation;
 using Ookii.Dialogs.Wpf;
 using TorrentHardLinkHelper.HardLink;
 using TorrentHardLinkHelper.Locate;

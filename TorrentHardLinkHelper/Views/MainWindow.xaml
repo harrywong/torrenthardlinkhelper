@@ -5,7 +5,7 @@
         xmlns:mvvm="http://www.galasoft.ch/mvvmlight"
         xmlns:models="clr-namespace:TorrentHardLinkHelper.Models"
         DataContext="{Binding Source={StaticResource Locator}, Path=Main}"
-        Title="Torrent HardLink Helper v0.8" Height="700" Width="680">
+        Title="Torrent HardLink Helper v0.9" Height="700" Width="680">
     <Grid Margin="5">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
