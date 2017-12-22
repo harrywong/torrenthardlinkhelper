@@ -19,7 +19,7 @@ namespace TorrentHardLinkHelper.ViewModels
 {
     public class MainViewModel : ViewModelBase
     {
-        private static readonly IList<string> _outputNameTypes = new[] { "Torrent Name", "Torrent Title", "Custom" };
+        private static readonly IList<string> _outputNameTypes = new[] { "Torrent Title", "Torrent Name", "Custom" };
 
         private string _torrentFile;
         private string _sourceFolder;
@@ -32,6 +32,7 @@ namespace TorrentHardLinkHelper.ViewModels
         private int _maxProcess;
         private int _curProcess;
         private Torrent _torrent;
+        private int _unlocatedCount = -1;
         private IList<FileSystemFileInfo> _fileSystemFileInfos;
         private IList<EntityModel> _fileSystemEntityModel;
         private IList<EntityModel> _torrentEntityModel;
@@ -208,6 +209,7 @@ namespace TorrentHardLinkHelper.ViewModels
                         .Distinct()
                         .Count(), this._fileSystemFileInfos.Count);
                 this._locateResult = result;
+                this._unlocatedCount = result.UnlocatedCount;
 
                 EntityModel.Update(this._fileSystemEntityModel[0],
                     result.TorrentFileLinks.Where(c => c.State == LinkState.Located).Select(c => c.LinkedFsFileInfo));
@@ -241,11 +243,20 @@ namespace TorrentHardLinkHelper.ViewModels
                     "Link failed, the output basefolder and the source folder must be in the same driver!");
                 return;
             }
+            if (this._unlocatedCount != 0) {
+                MessageBoxResult result = MessageBox.Show(this._unlocatedCount + " files unlocated, hard link anyway?", "Confirm", MessageBoxButton.OKCancel, MessageBoxImage.Warning, MessageBoxResult.Cancel);
+                if (result != MessageBoxResult.OK) {
+                    return;
+                }
+            }
 
             this.UpdateStatusFormat("Linking...");
             var helper = new HardLinkHelper();
             helper.HardLink(this._locateResult.TorrentFileLinks, this._copyLimitSize, this._outputName,
                 this._outputBaseFolder);
+            // copy .torrent file
+            string targetTorrentFile = Path.Combine(Path.Combine(this._outputBaseFolder, this._outputName), Path.GetFileName(_torrentFile));
+            helper.Copy(_torrentFile, targetTorrentFile);
             this.UpdateStatusFormat("Done.");
             Process.Start("explorer.exe", Path.Combine(this._outputBaseFolder, this._outputName));
         }
